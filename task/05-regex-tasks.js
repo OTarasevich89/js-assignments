@@ -1,7 +1,6 @@
-
 /** ******************************************************************************************
  *                                                                                          *
- * Plese read the following tutorial before implementing tasks:                             *
+ * Please read the following tutorial before implementing tasks:                             *
  * https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions           *
  *                                                                                          *
  ******************************************************************************************* */
@@ -29,8 +28,8 @@
  *
  * @return {RegExp}
  */
-function getRegexForGuid() {
-  throw new Error('Not implemented');
+export function getRegexForGuid() {
+  return /^{[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}}$/;
 }
 
 
@@ -46,13 +45,13 @@ function getRegexForGuid() {
  *  'slap two'                'part'
  *  'respite'
  *
- * NOTE : the regex lenth should be < 13
+ * NOTE : the regex length should be < 13
  *
  * @return {RegExp}
  *
  */
-function getRegexForPitSpot() {
-  throw new Error('Not implemented');
+export function getRegexForPitSpot() {
+  return /p.t/;
 }
 
 
@@ -70,8 +69,8 @@ function getRegexForPitSpot() {
  *
  * @return {RegExp}
  */
-function getRegexForIPv4() {
-  throw new Error('Not implemented');
+export function getRegexForIPv4() {
+  return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 }
 
 
@@ -89,14 +88,14 @@ function getRegexForIPv4() {
  *                                   '0S4-H1-HACK'
  * @return {RegExp}
  */
-function getRegexForSSN() {
-  throw new Error('Not implemented');
+export function getRegexForSSN() {
+  return /^(?!000)[0-9]{3}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$/;
 }
 
 
 /**
  * Returns the password validator regex.
- * Regex will validate a password to make sure it meets the follwing criteria:
+ * Regex will validate a password to make sure it meets the following criteria:
  *  - At least specified characters long (argument minLength)
  *  - Contains a lowercase letter
  *  - Contains an uppercase letter
@@ -114,14 +113,6 @@ function getRegexForSSN() {
  *   'PASSW0RD'.match(validator)  => false
  *   'Pa55'.match(validator) => false
  */
-function getPasswordValidator(minLength) {
-  throw new Error('Not implemented');
+export function getPasswordValidator(minLength) {
+  return new RegExp('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[A-Za-z0-9]{' + minLength + ',}$');
 }
-
-module.exports = {
-  getRegexForGuid: getRegexForGuid,
-  getRegexForPitSpot: getRegexForPitSpot,
-  getRegexForIPv4: getRegexForIPv4,
-  getRegexForSSN: getRegexForSSN,
-  getPasswordValidator: getPasswordValidator
-};

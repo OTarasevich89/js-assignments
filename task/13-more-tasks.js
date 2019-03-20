@@ -11,9 +11,17 @@
  *   'zxxlal','laxk'    => 'aklxz'
  *   'abcdefghijklmnop',  'lmnopqrstuvwxyz'  => 'abcdefghijklmnopqrstuvwxyz'
  */
-function distinctLettersString(value1, value2) {
-  throw new Error('Not implemented');
+export function distinctLettersString(value1, value2) {
+  let str = value1 + value2;
+  const sortStr = str.split('').sort((a, b) => {
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+  });
+  const set = new Set(sortStr);
+  return [...set].join('');
 }
+
 
 
 /**
@@ -28,9 +36,20 @@ function distinctLettersString(value1, value2) {
  *
  */
 
-function lowerLetters(value) {
-  throw new Error('Not implemented');
+export function lowerLetters(value) {
+  const arr = value.split('').sort();
+  let result = [];
+  arr.forEach(el => {
+    if (el.charCodeAt() >= 97 && el.charCodeAt() <= 122) {
+      result = [...result, el];
+    }
+  });
+  return result.reduce((acc, el) => {
+    acc[el] = (acc[el] || 0) + 1;
+    return acc;
+  }, {});
 }
+
 
 /**
  * Write a function that will convert a string into title case, given an optional
@@ -50,9 +69,35 @@ function lowerLetters(value) {
  *    'the quick brown fox'  => 'The Quick Brown Fox'
  */
 
-function titleCaseConvert(title, minorWords) {
-  throw new Error('Not implemented');
+export function titleCaseConvert(title, minorWords) {
+  var answer = [];
+  if (minorWords) {
+    minorWords = minorWords.toLowerCase();
+  } else {
+    minorWords = '';
+  }
+  title = title.toLowerCase().split(' ');
+
+  title.forEach(function(word, index, array) {
+    if (index === 0) {
+      answer.push(capitalizeFirst(word));
+    } else if (minorWords.indexOf(word) !== -1) {
+      answer.push(word);
+    } else {
+      answer.push(capitalizeFirst(word));
+    }
+  });
+
+  function capitalizeFirst(arg) {
+    arg = arg.split('');
+    arg[0] = arg[0].toUpperCase();
+    arg = arg.join('');
+    return arg;
+  }
+
+  return answer.join(' ');
 }
+
 
 /**
  * Your job is to create a calculator which evaluates expressions in Reverse Polish
@@ -71,13 +116,27 @@ function titleCaseConvert(title, minorWords) {
  *  '5 1 2 + 4 * + 3 -'  =>  14   // 5 + ((1 + 2) * 4) -3
  */
 
-function calcRPN(expr) {
-  throw new Error('Not implemented');
-}
+export function calcRPN(expr) {
+  let stack = expr.split(' ');
 
-module.exports = {
-  distinctLettersString,
-  lowerLetters,
-  titleCaseConvert,
-  calcRPN
-};
+  for (let i = 0; i < stack.length; ) {
+    let val = stack[i];
+
+    if (val === '+') {
+      stack.splice(i - 2, 3, +stack[i - 2] + +stack[i - 1]);
+      i -= 2;
+    } else if (val === '-') {
+      stack.splice(i - 2, 3, +stack[i - 2] - +stack[i - 1]);
+      i -= 2;
+    } else if (val === '*') {
+      stack.splice(i - 2, 3, +stack[i - 2] * +stack[i - 1]);
+      i -= 2;
+    } else if (val === '/') {
+      stack.splice(i - 2, 3, +stack[i - 2] / +stack[i - 1]);
+      i -= 2;
+    }
+    i++;
+  }
+
+  return stack[stack.length - 1];
+}

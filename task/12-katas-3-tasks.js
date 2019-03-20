@@ -27,9 +27,36 @@
  *   'FUNCTION'  => false
  *   'NULL'      => false
  */
-function findStringInSnakingPuzzle(puzzle, searchStr) {
-  throw new Error('Not implemented');
+export function findStringInSnakingPuzzle(puzzle, searchStr) {
+  function rec(exclude) {
+    if (searchStr.length === exclude.length) return true;
+    let pos = exclude[exclude.length - 1];
+    for (let val of [[0, 1], [1, 0], [0, -1], [-1, 0]]) {
+      if (
+        pos[0] + val[0] >= 0 &&
+        pos[0] + val[0] < puzzle.length &&
+        pos[1] + val[1] >= 0 &&
+        pos[1] + val[1] < puzzle[pos[0] + val[0]].length &&
+        !exclude.some(
+          v => v[0] === pos[0] + val[0] && v[1] === pos[1] + val[1]
+        ) &&
+        puzzle[pos[0] + val[0]][pos[1] + val[1]] === searchStr[exclude.length]
+      ) {
+        if (rec(exclude.concat([[pos[0] + val[0], pos[1] + val[1]]]))) {
+          return true;
+        }
+      }
+    }
+  }
+
+  for (let i = 0; i < puzzle.length; i++) {
+    for (let j = 0; j < puzzle[i].length; j++) {
+      if (puzzle[i][j] === searchStr[0] && rec([[i, j]])) return true;
+    }
+  }
+  return false;
 }
+
 
 
 /**
@@ -45,8 +72,17 @@ function findStringInSnakingPuzzle(puzzle, searchStr) {
  *    'ab'  => 'ab','ba'
  *    'abc' => 'abc','acb','bac','bca','cab','cba'
  */
-function* getPermutations(chars) {
-  throw new Error('Not implemented');
+export function* getPermutations(chars) {
+  function* rec(str) {
+    if (str.length === chars.length) yield str;
+    else {
+      for (let i = 0; i < chars.length; i++) {
+        if (str.indexOf(chars[i]) < 0) yield* rec(str + chars[i]);
+      }
+    }
+  }
+
+  yield* rec('');
 }
 
 
@@ -67,8 +103,19 @@ function* getPermutations(chars) {
  *    [ 6, 5, 4, 3, 2, 1]   => 0   (nothing to buy)
  *    [ 1, 6, 5, 10, 8, 7 ] => 18  (buy at 1,6,5 and sell all at 10)
  */
-function getMostProfitFromStockQuotes(quotes) {
-  throw new Error('Not implemented');
+export function getMostProfitFromStockQuotes(quotes) {
+  let maximums = quotes
+    .reduceRight((previous, current) => {
+      if (previous.length === 0)
+      {return [current];}
+      previous.push(Math.max(previous[previous.length - 1], current));
+      return previous;
+    }, [])
+    .reverse();
+  maximums.push(0);
+  return quotes.reduce((previous, current, index) => {
+    return previous + Math.max(0, maximums[index + 1] - current);
+  }, 0);
 }
 
 
@@ -86,25 +133,68 @@ function getMostProfitFromStockQuotes(quotes) {
  *   var original  = urlShortener.decode(shortLink); // => 'https://en.wikipedia.org/wiki/URL_shortening'
  *
  */
-function UrlShortener() {
+export function UrlShortener() {
   this.urlAllowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
                           'abcdefghijklmnopqrstuvwxyz' +
                           "0123456789-_.~!*'();:@&=+$,/?#[]";
 }
 
 UrlShortener.prototype = {
-  encode(url) {
-    throw new Error('Not implemented');
+  encode: function(url) {
+    let code = url.slice(8);
+    code = code
+      .split('')
+      .map(val => {
+        let cur = '' + (val.charCodeAt(0) - 27);
+
+        if (cur.length === 1) return '0' + cur;
+        return cur;
+      })
+      .join('');
+
+    let codeSequence = [];
+
+    for (let i = 3; i <= code.length; i += 3) {
+      codeSequence.push(code.slice(i - 3, i));
+
+      if (code.length - i < 3) {
+        let repeat = code.length - i > 1 ? 1 : 2;
+        codeSequence.push(code.slice(i) + '0'.repeat(repeat));
+        break;
+      }
+    }
+
+    code = codeSequence.map(val => String.fromCharCode(val)).join('');
+
+    return code;
   },
 
-  decode(code) {
-    throw new Error('Not implemented');
-  }
-};
+  decode: function(code) {
+    let url = code
+      .split('')
+      .map(val => {
+        let cur = '' + val.charCodeAt(0);
+        if (cur.length === 2) return '0' + cur;
+        else if (cur.length === 1) return '00' + cur;
+        return cur;
+      })
+      .join('');
 
-module.exports = {
-  findStringInSnakingPuzzle: findStringInSnakingPuzzle,
-  getPermutations: getPermutations,
-  getMostProfitFromStockQuotes: getMostProfitFromStockQuotes,
-  UrlShortener: UrlShortener
+    let urlSequence = [];
+
+    for (let i = 2; i <= url.length; i += 2) {
+      urlSequence.push(url.slice(i - 2, i));
+    }
+
+    url = urlSequence
+      .map(val => {
+        if (+val !== 0) return String.fromCharCode(+val + 27);
+        else if (val[0] !== '0' && val[1] === '0') {
+          return String.fromCharCode(+val.charAt(0) + 27);
+        }
+      })
+      .join('');
+
+    return 'https://' + url;
+  }
 };

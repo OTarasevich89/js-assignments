@@ -15,18 +15,46 @@
  *     { abbreviation : 'NbW',   azimuth : 348.75 }
  *  ]
  */
-function createCompassPoints(sides = ['N', 'E', 'S', 'W']) {
-  /* use array of cardinal directions only! it is a default parameter! */
-  throw new Error('Not implemented');
-}
+export function createCompassPoints(sides = ['N', 'E', 'S', 'W']) {
+  function* directCoors(from, to, dir) {
+    let result = [`${from}b${to}`, `${from}${from}${to}`, `${from}${to}b${from}`, `${from}${to}`, `${from}${to}b${to}`, `${to}${from}${to}`, `${to}b${from}`];
 
+    if (dir === 'f')
+    {result.reverse();}
+
+    for (let i of result) {
+      yield i;
+    }
+  }
+
+  let result = [],
+    azimuth = 0,
+    items = [
+      {dir: 'N', func: directCoors('N', 'E', 'd')},
+      {dir: 'E', func: directCoors('S', 'E', 'f')},
+      {dir: 'S', func: directCoors('S', 'W', 'd')},
+      {dir: 'W', func: directCoors('N', 'W', 'f')}
+    ];
+
+  items.forEach(item => {
+    result.push({abbreviation: item.dir, azimuth: azimuth});
+    azimuth += 11.25;
+
+    for (let i = 0; i < 7; i++) {
+      result.push({abbreviation: item.func.next().value, azimuth: azimuth});
+      azimuth += 11.25;
+    }
+  });
+
+  return result;
+}
 
 /**
  * Expand the braces of the specified string.
  * See https://en.wikipedia.org/wiki/Bash_(Unix_shell)#Brace_expansion
  *
  * In the input string, balanced pairs of braces containing comma-separated substrings
- * represent alternations that specify multiple alternatives which are to appear 
+ * represent alternations that specify multiple alternatives which are to appear
  * at that position in the output.
  *
  * @param {string} str
@@ -55,15 +83,28 @@ function createCompassPoints(sides = ['N', 'E', 'S', 'W']) {
  *
  *   'nothing to do' => 'nothing to do'
  */
-function* expandBraces(str) {
-  throw new Error('Not implemented');
+export function* expandBraces(str) {
+  const input = [str],
+    exist = [];
+  while (input.length > 0) {
+    str = input.shift();
+    let match = str.match(/\{([^{}]+)\}/);
+    if (match) {
+      for (let value of match[1].split(',')) {
+        input.push(str.replace(match[0], value));
+      }
+    } else if (exist.indexOf(str) < 0) {
+      exist.push(str);
+      yield str;
+    }
+  }
 }
 
 
 /**
  * Returns the ZigZag matrix
  *
- * The fundamental idea in the JPEG compression algorithm is to sort coefficient 
+ * The fundamental idea in the JPEG compression algorithm is to sort coefficient
  * of given image by zigzag path and encode it.
  * In this task you are asked to implement a simple method to create a zigzag square matrix.
  * See details at https://en.wikipedia.org/wiki/JPEG#Entropy_coding
@@ -88,8 +129,24 @@ function* expandBraces(str) {
  *          [ 9,10,14,15 ]]
  *
  */
-function getZigZagMatrix(n) {
-  throw new Error('Not implemented');
+export function getZigZagMatrix(n) {
+  const mtx = [];
+  for (let i = 0; i < n; i++) mtx[i] = [];
+  let i = 1,
+    j = 1;
+  for (let e = 0; e < n * n; e++) {
+    mtx[i - 1][j - 1] = e;
+    if ((i + j) % 2 === 0) {
+      if (j < n) j++;
+      else i += 2;
+      if (i > 1) i--;
+    } else {
+      if (i < n) i++;
+      else j += 2;
+      if (j > 1) j--;
+    }
+  }
+  return mtx;
 }
 
 
@@ -98,7 +155,7 @@ function getZigZagMatrix(n) {
  * Dominoes details see at: https://en.wikipedia.org/wiki/Dominoes
  *
  * Each domino tile presented as an array [x,y] of tile value.
- * For example, the subset [1, 1], [2, 2], [1, 2] can be arranged in a row 
+ * For example, the subset [1, 1], [2, 2], [1, 2] can be arranged in a row
  *  (as [1, 1] followed by [1, 2] followed by [2, 2]),
  * while the subset [1, 1], [0, 3], [1, 4] can not be arranged in one row.
  * NOTE that as in usual dominoes playing any pair [i, j] can also be treated as [j, i].
@@ -114,8 +171,33 @@ function getZigZagMatrix(n) {
  * [[0,0], [0,1], [1,1], [0,2], [1,2], [2,2], [0,3], [1,3], [2,3], [3,3]] => false
  *
  */
-function canDominoesMakeRow(dominoes) {
-  throw new Error('Not implemented');
+export function canDominoesMakeRow(dominoes) {
+  function dfs(current, value, left) {
+    if (left === 0) {
+      result = true;
+      return;
+    }
+
+    visited[current] = true;
+
+    for (let i = 0; i < dominoes.length; i++) {if (!visited[i]) {
+      if (dominoes[i].indexOf(value) !== -1) {
+        dfs(i, dominoes[i][0] === value ? dominoes[i][1] : dominoes[i][0], left - 1);
+      }
+    }}
+
+    visited[current] = false;
+  }
+
+  let result = false, visited = new Array(dominoes.length);
+  visited.fill(false);
+
+  for (let i = 0; i < dominoes.length; i++) {
+    dfs(i, dominoes[i][0], dominoes.length - 1);
+    dfs(i, dominoes[i][1], dominoes.length - 1);
+  }
+
+  return result;
 }
 
 
@@ -124,10 +206,10 @@ function canDominoesMakeRow(dominoes) {
  *
  * A format for expressing an ordered list of integers is to use a comma separated list of either:
  *   - individual integers
- *   - or a range of integers denoted by the starting integer separated from the end 
+ *   - or a range of integers denoted by the starting integer separated from the end
  *     integer in the range by a dash, '-'.
  *     (The range includes all integers in the interval including both endpoints)
- *     The range syntax is to be used only for, and for every range that expands to 
+ *     The range syntax is to be used only for, and for every range that expands to
  *     more than two values.
  *
  * @params {array} nums
@@ -140,14 +222,16 @@ function canDominoesMakeRow(dominoes) {
  * [ 0, 1, 2, 5, 7, 8, 9] => '0-2,5,7-9'
  * [ 1, 2, 4, 5]          => '1,2,4,5'
  */
-function extractRanges(nums) {
-  throw new Error('Not implemented');
+export function extractRanges(nums) {
+  let arr = [[nums[0]]];
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i] - 1 === arr[arr.length - 1][arr[arr.length - 1].length - 1]) {
+      arr[arr.length - 1].push(nums[i]);
+    } else arr.push([nums[i]]);
+  }
+  for (let i in arr) {
+    if (arr[i].length > 2) arr[i] = arr[i][0] + '-' + arr[i][arr[i].length - 1];
+    else arr[i] = arr[i].join(',');
+  }
+  return arr.join(',');
 }
-
-module.exports = {
-  createCompassPoints : createCompassPoints,
-  expandBraces : expandBraces,
-  getZigZagMatrix : getZigZagMatrix,
-  canDominoesMakeRow : canDominoesMakeRow,
-  extractRanges : extractRanges
-};

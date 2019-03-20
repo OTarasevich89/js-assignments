@@ -20,8 +20,8 @@
  *   5, 10 => 50
  *   5, 5  => 25
  */
-function getRectangleArea(width, height) {
-  throw new Error('Not implemented');
+export function getRectangleArea(width, height) {
+  return width * height;
 }
 
 
@@ -36,8 +36,8 @@ function getRectangleArea(width, height) {
  *   3.14 => 19.729201864543903
  *   0    => 0
  */
-function getCicleCircumference(radius) {
-  throw new Error('Not implemented');
+export function getCicleCircumference(radius) {
+  return 2*Math.PI*radius ;
 }
 
 /**
@@ -52,8 +52,8 @@ function getCicleCircumference(radius) {
  *  10, 0  => 5
  *  -3, 3  => 0
  */
-function getAverage(value1, value2) {
-  throw new Error('Not implemented');
+export function getAverage(value1, value2) {
+  return value1/2 + value2/2;
 }
 
 /**
@@ -70,11 +70,11 @@ function getAverage(value1, value2) {
  *   (0,0) (0,1)    => 1
  *   (0,0) (1,0)    => 1
  *   (-5,0) (10,-10) => 18.027756377319946
- *   (4, 2) (1, 6) => 5
  */
-function getDistanceBetweenPoints(x1, y1, x2, y2) {
-  throw new Error('Not implemented');
+export function getDistanceBetweenPoints(x1, y1, x2, y2) {
+  return Math.hypot((x2-x1), (y2-y1));
 }
+
 
 /**
  * Returns a root of linear equation a*x + b = 0 given by coefficients a and b.
@@ -88,8 +88,8 @@ function getDistanceBetweenPoints(x1, y1, x2, y2) {
  *   x + 8 = 0       => -8
  *   5*x = 0         => 0
  */
-function getLinearEquationRoot(a, b) {
-  throw new Error('Not implemented');
+export function getLinearEquationRoot(a, b) {
+  return -b/a;
 }
 
 
@@ -111,8 +111,10 @@ function getLinearEquationRoot(a, b) {
  *   (0,1) (0,1)     => 0
  *   (0,1) (1,2)     => 0
  */
-function getAngleBetweenVectors(x1, y1, x2, y2) {
-  throw new Error('Not implemented');
+export function getAngleBetweenVectors(x1, y1, x2, y2) {
+  var a = x1*x2 + y1*y2;
+  var module = Math.sqrt(x1*x1 + y1*y1)*Math.sqrt(x2*x2 + y2*y2);
+  return Math.acos(a /module);
 }
 
 /**
@@ -127,8 +129,8 @@ function getAngleBetweenVectors(x1, y1, x2, y2) {
  *     5     => 5
  *     0     => 0
  */
-function getLastDigit(value) {
-  throw new Error('Not implemented');
+export function getLastDigit(value) {
+  return value%10;
 }
 
 
@@ -143,8 +145,8 @@ function getLastDigit(value) {
  *     '37'     => 37
  * '-525.5'     => -525.5
  */
-function parseNumberFromString(value) {
-  throw new Error('Not implemented');
+export function parseNumberFromString(value) {
+  return parseFloat(value);
 }
 
 /**
@@ -160,8 +162,8 @@ function parseNumberFromString(value) {
  *   3,3,3   => 5.196152422706632
  *   1,2,3   => 3.741657386773941
  */
-function getParallelipidedDiagonal(a, b, c) {
-  throw new Error('Not implemented');
+export function getParallelipidedDiagonal(a, b, c) {
+  return Math.sqrt (a*a + b*b + c*c);
 }
 
 /**
@@ -181,8 +183,10 @@ function getParallelipidedDiagonal(a, b, c) {
  *   1678, 2  => 1700
  *   1678, 3  => 2000
  */
-function roundToPowerOfTen(num, pow) {
-  throw new Error('Not implemented');
+export function roundToPowerOfTen(num, pow) {
+  var power = Math.pow(10, pow);
+  var result = Math.round((Math.round(num))/power)*power;
+  return result;
 }
 
 /**
@@ -202,10 +206,17 @@ function roundToPowerOfTen(num, pow) {
  *   16 => false
  *   17 => true
  */
-function isPrime(n) {
-  throw new Error('Not implemented');
+export function isPrime(n) {
+  var sqrtnum=Math.floor(Math.sqrt(n));
+  var prime = n !== 1;
+  for(var i=2; i<sqrtnum+1; i++) { // sqrtnum+1
+    if(n % i === 0) {
+      prime = false;
+      break;
+    }
+  }
+  return prime;
 }
-
 /**
  * Tries to convert value to number and returns it if conversion was successfull;
  * otherwise returns default value passed as a second argument.
@@ -221,21 +232,9 @@ function isPrime(n) {
  *   toNumber(42, 0) => 42
  *   toNumber(new Number(42), 0) => 42
  */
-function toNumber(value, def) {
-  throw new Error('Not implemented');
+export function toNumber(value, def) {
+  if (Number(value)){
+    return parseFloat(value);
+  }
+  else return def;
 }
-
-module.exports = {
-  getRectangleArea: getRectangleArea,
-  getCicleCircumference: getCicleCircumference,
-  getAverage: getAverage,
-  getDistanceBetweenPoints: getDistanceBetweenPoints,
-  getLinearEquationRoot: getLinearEquationRoot,
-  getAngleBetweenVectors: getAngleBetweenVectors,
-  getLastDigit: getLastDigit,
-  parseNumberFromString: parseNumberFromString,
-  getParallelipidedDiagonal: getParallelipidedDiagonal,
-  roundToPowerOfTen: roundToPowerOfTen,
-  isPrime: isPrime,
-  toNumber: toNumber
-};

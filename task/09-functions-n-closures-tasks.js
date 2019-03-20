@@ -24,10 +24,9 @@
  *   getComposition(Math.sin, Math.asin)(x) => Math.sin(Math.acos(x))
  *
  */
-function getComposition(f, g) {
-  throw new Error('Not implemented');
+export function getComposition(f, g) {
+  return x => f(g(x));
 }
-
 
 /**
  * Returns the math power function with the specified exponent
@@ -45,8 +44,8 @@ function getComposition(f, g) {
  *   power05(16) => 4
  *
  */
-function getPowerFunction(exponent) {
-  throw new Error('Not implemented');
+export function getPowerFunction(exponent) {
+  return x => Math.pow(x, exponent);
 }
 
 
@@ -63,8 +62,13 @@ function getPowerFunction(exponent) {
  *   getPolynom(8)     => y = 8
  *   getPolynom()      => null
  */
-function getPolynom() {
-  throw new Error('Not implemented');
+export function getPolynom(...args) {
+  args.reverse();
+  return x => {
+    return args.reduce((previous, current, index) => {
+      return previous + current * Math.pow(x, index);
+    }, 0);
+  };
 }
 
 
@@ -82,8 +86,9 @@ function getPolynom() {
  *   ...
  *   memoizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(func) {
-  throw new Error('Not implemented');
+export function memoize(func) {
+  const result = func();
+  return () => result;
 }
 
 
@@ -102,10 +107,17 @@ function memoize(func) {
  * }, 2);
  * retryer() => 2
  */
-function retry(func, attempts) {
-  throw new Error('Not implemented');     
+export function retry(func, attempts) {
+  return function() {
+    for (let i = 0; i <= attempts; i++) {
+      try {
+        return func();
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+  };
 }
-
 
 /**
  * Returns the logging wrapper for the specified method,
@@ -130,8 +142,17 @@ function retry(func, attempts) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(func, logFunc) {
-  throw new Error('Not implemented');
+export function logger(func, logFunc) {
+  return function(...args) {
+    let callString = JSON.stringify(args);
+    callString = callString.substr(1, callString.length - 2);
+    callString = `${func.name}(${callString})`;
+    logFunc(callString + ' starts');
+    let result = func.apply(null, args);
+    logFunc(callString + ' ends');
+
+    return result;
+  };
 }
 
 
@@ -148,13 +169,18 @@ function logger(func, logFunc) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(fn) {
-  throw new Error('Not implemented');
+export function partialUsingArguments(fn) {
+  let args = Array.from(arguments);
+  args.splice(0, 1);
+  return function () {
+    args = args.concat(Array.from(arguments));
+    return fn.apply(null, args);
+  };
 }
 
 
 /**
- * Returns the id generator function that returns next integer starting from specified 
+ * Returns the id generator function that returns next integer starting from specified
  * number every time when invoking.
  *
  * @param {Number} startFrom
@@ -170,17 +196,6 @@ function partialUsingArguments(fn) {
  *   getId4() => 7
  *   getId10() => 11
  */
-function getIdGeneratorFunction(startFrom) {
-  throw new Error('Not implemented');
+export function getIdGeneratorFunction(startFrom) {
+  return () => startFrom++;
 }
-
-module.exports = {
-  getComposition: getComposition,
-  getPowerFunction: getPowerFunction,
-  getPolynom: getPolynom,
-  memoize: memoize,
-  retry: retry,
-  logger: logger,
-  partialUsingArguments: partialUsingArguments,
-  getIdGeneratorFunction: getIdGeneratorFunction
-};
